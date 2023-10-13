@@ -1,0 +1,9 @@
+basePath: /api/v1
+host: 0.0.0.0:8070
+info:
+  contact:
+    name: Alex Romantsov
+  title: VTB_MAP_API
+  version: "1.0"
+paths: {}
+swagger: "2.0"

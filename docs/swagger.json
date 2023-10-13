@@ -1,0 +1,13 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "VTB_MAP_API",
+        "contact": {
+            "name": "Alex Romantsov"
+        },
+        "version": "1.0"
+    },
+    "host": "0.0.0.0:8070",
+    "basePath": "/api/v1",
+    "paths": {}
+}

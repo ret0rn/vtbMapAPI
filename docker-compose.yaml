@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./docker
+      dockerfile: app.dockerfile
+    ports:
+      - "8070:8070"
+    restart: on-failure
+    env_file:
+      - env/${ENVIRONMENT:-develop}/database.env
+      - env/${ENVIRONMENT:-develop}/app.env
+    depends_on:
+      - database
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "2g"
+
+  database:
+    build:
+      context: ./docker
+      dockerfile: postgis.dockerfile
+    restart: always
+    ports:
+      - "6452:5432"
+    volumes:
+      - ./db/${ENVIRONMENT:-develop}/postgres/data:/var/lib/postgresql/data
+      - ./sql_schemes/init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - env/${ENVIRONMENT:-develop}/database.env
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "2g"
