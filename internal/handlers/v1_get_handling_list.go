@@ -24,21 +24,23 @@ type GetHandlingListByClientResponseData struct {
 }
 
 // GetHandlingListByClient     godoc
-// @Summary                    получение возможных услуг исходя из типа клиента (физ. лицо/юр. лицо)
+// @Summary                    Получение словаря услуг по типу клиента (физ или юр лицо)
 // @Produce                    json
-// @Param                      req query GetHandlingListByClientRequest true "Handling List"
+// @Param                      req query GetHandlingListByClientRequest true "Handling list by client request"
 // @Success                    200 {object} GetHandlingListByClientResponse
 // @Router                     /handling_list/by_client [get]
 func (i *Implementation) GetHandlingListByClient(ctx *gin.Context) {
-	var req GetHandlingListByClientRequest
+	var req GetHandlingListByClientRequest // получаем и валидируем запрос
 	if err := ctx.BindQuery(&req); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, model.NewError("Ошибка валидации %s", err.Error()))
 		return
 	}
+	// проверяем что полученный тип клиента мы сможем обработать
 	if !req.ClientType.IsWorkClientType() {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, model.NewError("Недопустимый ClientType %d", req.ClientType))
 		return
 	}
+	// получение данных из базы
 	list, err := i.srv.GetHandlingListByFilter(ctx, &model.HandlingFilter{ClientType: req.ClientType})
 	if err != nil {
 		logrus.Error(ctx, "[GetHandlingListByClient] - cent's get handling list %s", err.Error())

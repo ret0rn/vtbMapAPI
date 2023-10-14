@@ -1,3 +1,6 @@
+-- Extensions
+CREATE EXTENSION postgis;
+
 -- Tables
 -- офисы
 CREATE TABLE public."office" (
@@ -6,11 +9,16 @@ CREATE TABLE public."office" (
     longitude numeric(9, 6) NOT NULL,
     latitude numeric(9, 6) NOT NULL,
     location point NOT NULL,
+    geom geometry(Point, 4326) NULL,
     address text NOT NULL,
     office_name text NOT NULL,
     is_active bool NOT NULL DEFAULT true,
-    timetable jsonb NULL,
+    timetable_individual jsonb NULL,
+    timetable_enterprise jsonb NULL,
     metro_station text NOT NULL,
+    handling_ids int8[] NULL,
+    client_types int8[] NULL,
+    max_people_on_window int8 NOT NULL DEFAULT 0,
     has_ramp bool NOT NULL DEFAULT false,
     created timestamp NOT NULL DEFAULT now(),
     updated timestamp NOT NULL DEFAULT now(),
@@ -18,6 +26,7 @@ CREATE TABLE public."office" (
 );
 CREATE UNIQUE INDEX office_office_id_uindex ON public."office" USING btree (office_id);
 CREATE INDEX ON "office" USING GIST(location);
+CREATE INDEX ON "office" USING GIST(geom);
 
 -- очередь с талонами
 CREATE TABLE public."queue_tickets" (
@@ -37,7 +46,6 @@ CREATE TABLE public."handling" (
     title text NOT NULL,
     client_type int8 NOT NULL,
     handling_duration interval NOT NULL,
-    offices_ids int8[] NOT NULL,
     created timestamp NOT NULL DEFAULT now(),
     updated timestamp NOT NULL DEFAULT now(),
     CONSTRAINT services_pkey PRIMARY KEY (id)
@@ -55,13 +63,28 @@ CREATE TABLE public."office_rating" (
 );
 CREATE UNIQUE INDEX office_rating_office_id_uindex ON public."office_rating" USING btree (office_id);
 
--- Extensions
-CREATE EXTENSION postgis;
+-- Insert Data
+-- Вставка данных для физических лиц
+INSERT INTO public."handling" (title, client_type, handling_duration)
+VALUES
+    ('Счета и платежи', 1, '1 min'::interval),
+    ('Кредитование', 1, '2 min'::interval),
+    ('Инвестиции', 1, '3 min'::interval),
+    ('Пластиковые карты', 1, '1 min'::interval),
+    ('Интернет-банкинг', 1, '2 min'::interval),
+    ('Доверительное управление', 1, '3 min'::interval),
+    ('Валютные операции', 1, '1 min'::interval),
+    ('Сейфовое хранение', 1, '2 min'::interval);
+
+-- Вставка данных для юридических лиц
+INSERT INTO public."handling" (title, client_type, handling_duration)
+VALUES
+    ('Открытие корпоративного счета', 2, '1 min'::interval),
+    ('Кредиты и финансирование', 2, '2 min'::interval),
+    ('Управление денежными потоками', 2, '3 min'::interval),
+    ('Обслуживание пластиковых карт', 2, '1 min'::interval),
+    ('Управление рисками', 2, '2 min'::interval);
 
 INSERT INTO public."office"
-(longitude, latitude, "location", address, office_name, metro_station, has_ramp)
-VALUES(36.984314, 56.184479, '(36.984314, 56.184479)', 'address', 'Address 1', 'Metro', false);
-
-INSERT INTO public."handling"
-(title, client_type, handling_duration, offices_ids)
-VALUES('Счета и платежи', 1, '1 min'::interval, ARRAY [1, 2, 3, 4, 5, 6, 7, 8, 10]);
+(longitude, latitude, "location", address, office_name, metro_station, has_ramp, geom)
+VALUES(36.984314, 56.184479, '(36.984314, 56.184479)', 'address', 'Address 1', 'Metro', false, ST_SetSRID(ST_MakePoint('36.984314', '56.184479'), 4326));

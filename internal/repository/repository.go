@@ -9,7 +9,10 @@ import (
 )
 
 type Repo interface {
-	GetHandlingList(context.Context, *model.HandlingFilter) ([]*model.Handling, error)
+	GetHandlingList(context.Context, *model.HandlingFilter) (model.HandlingList, error)
+	GetOfficeLocation(context.Context, *model.OfficeLocationFilter) (model.OfficeLocationList, error)
+	GetRatesByOffice(context.Context, []int64) (map[int64]float64, error)
+	GetCountPeopleByOffice(context.Context, []int64, int64) (map[int64]int64, error)
 }
 
 type Repository struct {

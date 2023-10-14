@@ -17,6 +17,7 @@ type PublicHandler struct {
 func (a *App) InitHandlers(srv *service.Service) {
 	var api = handlers.NewPublicAPI(srv)
 	a.WithPublicHandler(http.MethodGet, "/handling_list/by_client", api.GetHandlingListByClient)
+	a.WithPublicHandler(http.MethodPost, "/office/location", api.GetOfficeLocationList)
 }
 
 func (a *App) WithPublicHandler(method, pattern string, handlerFunc gin.HandlerFunc) {

@@ -9,13 +9,9 @@ services:
     ports:
       - "6452:5432"
     volumes:
+      - ./db/${ENVIRONMENT:-develop}/postgres/data:/var/lib/postgresql/data
       # init tables
       - ./sql_schemes/init.sql:/docker-entrypoint-initdb.d/init.sql
-      # fill tables
-      #      - ./sql_schemes/fill_tables/fill_office.sql:/docker-entrypoint-initdb.d/fill_office.sql
-      #      - ./sql_schemes/fill_tables/fill_handling.sql:/docker-entrypoint-initdb.d/fill_handling.sql
-
-      - ./db/${ENVIRONMENT:-develop}/postgres/data:/var/lib/postgresql/data
     env_file:
       - env/${ENVIRONMENT:-develop}/database.env
     deploy:
@@ -40,3 +36,5 @@ services:
         limits:
           cpus: "1"
           memory: "1g"
+
+# TODO: сделать закрытую сеть, что бы не было доступа из вне

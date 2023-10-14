@@ -19,6 +19,78 @@ definitions:
       title:
         type: string
     type: object
+  handlers.GetOfficeLocationListRequestFilter:
+    properties:
+      client_type:
+        $ref: '#/definitions/model.ClientType'
+      handling_type:
+        type: integer
+    required:
+    - client_type
+    - handling_type
+    type: object
+  handlers.GetOfficeLocationListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/handlers.GetOfficeLocationListResponseData'
+        type: array
+    type: object
+  handlers.GetOfficeLocationListResponseData:
+    properties:
+      address:
+        type: string
+      client_types:
+        items:
+          $ref: '#/definitions/model.ClientType'
+        type: array
+      count_people:
+        type: integer
+      distance:
+        type: number
+      handling_types:
+        items:
+          type: integer
+        type: array
+      has_ramp:
+        type: boolean
+      latitude:
+        type: number
+      longitude:
+        type: number
+      metro_station:
+        type: string
+      office_id:
+        type: integer
+      officeName:
+        type: string
+      rate:
+        type: number
+      timetable_enterprise:
+        $ref: '#/definitions/handlers.GetOfficeLocationListResponseDataOfficeTimeTable'
+      timetable_individual:
+        $ref: '#/definitions/handlers.GetOfficeLocationListResponseDataOfficeTimeTable'
+      travel_duration_car:
+        type: number
+      travel_duration_human:
+        type: number
+    type: object
+  handlers.GetOfficeLocationListResponseDataDayTimeTable:
+    properties:
+      day:
+        type: string
+      start:
+        type: string
+      stop:
+        type: string
+    type: object
+  handlers.GetOfficeLocationListResponseDataOfficeTimeTable:
+    properties:
+      days:
+        items:
+          $ref: '#/definitions/handlers.GetOfficeLocationListResponseDataDayTimeTable'
+        type: array
+    type: object
   model.ClientType:
     enum:
     - 1
@@ -31,7 +103,7 @@ host: 0.0.0.0:8070
 info:
   contact:
     name: Alex Romantsov
-  title: VTB_MAP_API
+  title: vtbMapAPI
   version: "0.1"
 paths:
   /handling_list/by_client:
@@ -54,5 +126,24 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/handlers.GetHandlingListByClientResponse'
-      summary: получение возможных услуг исходя из типа клиента (физ. лицо/юр. лицо)
+      summary: Получение словаря услуг по типу клиента (физ или юр лицо)
+  /office/location:
+    post:
+      parameters:
+      - in: query
+        name: latitude
+        required: true
+        type: number
+      - in: query
+        name: longitude
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.GetOfficeLocationListResponse'
+      summary: Получение ближайших отделений с загруженностью
 swagger: "2.0"

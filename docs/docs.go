@@ -23,7 +23,7 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "получение возможных услуг исходя из типа клиента (физ. лицо/юр. лицо)",
+                "summary": "Получение словаря услуг по типу клиента (физ или юр лицо)",
                 "parameters": [
                     {
                         "enum": [
@@ -45,6 +45,36 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/handlers.GetHandlingListByClientResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/office/location": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Получение ближайших отделений с загруженностью",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "name": "latitude",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "name": "longitude",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GetOfficeLocationListResponse"
                         }
                     }
                 }
@@ -81,6 +111,116 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.GetOfficeLocationListRequestFilter": {
+            "type": "object",
+            "required": [
+                "client_type",
+                "handling_type"
+            ],
+            "properties": {
+                "client_type": {
+                    "$ref": "#/definitions/model.ClientType"
+                },
+                "handling_type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.GetOfficeLocationListResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.GetOfficeLocationListResponseData"
+                    }
+                }
+            }
+        },
+        "handlers.GetOfficeLocationListResponseData": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "client_types": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ClientType"
+                    }
+                },
+                "count_people": {
+                    "type": "integer"
+                },
+                "distance": {
+                    "type": "number"
+                },
+                "handling_types": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "has_ramp": {
+                    "type": "boolean"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "metro_station": {
+                    "type": "string"
+                },
+                "officeName": {
+                    "type": "string"
+                },
+                "office_id": {
+                    "type": "integer"
+                },
+                "rate": {
+                    "type": "number"
+                },
+                "timetable_enterprise": {
+                    "$ref": "#/definitions/handlers.GetOfficeLocationListResponseDataOfficeTimeTable"
+                },
+                "timetable_individual": {
+                    "$ref": "#/definitions/handlers.GetOfficeLocationListResponseDataOfficeTimeTable"
+                },
+                "travel_duration_car": {
+                    "type": "number"
+                },
+                "travel_duration_human": {
+                    "type": "number"
+                }
+            }
+        },
+        "handlers.GetOfficeLocationListResponseDataDayTimeTable": {
+            "type": "object",
+            "properties": {
+                "day": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "string"
+                },
+                "stop": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.GetOfficeLocationListResponseDataOfficeTimeTable": {
+            "type": "object",
+            "properties": {
+                "days": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.GetOfficeLocationListResponseDataDayTimeTable"
+                    }
+                }
+            }
+        },
         "model.ClientType": {
             "type": "integer",
             "enum": [
@@ -101,7 +241,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "0.0.0.0:8070",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "VTB_MAP_API",
+	Title:            "vtbMapAPI",
 	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

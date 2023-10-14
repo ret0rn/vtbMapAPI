@@ -9,7 +9,7 @@ import (
 	_ "go.uber.org/automaxprocs"
 )
 
-// @title          VTB_MAP_API
+// @title          vtbMapAPI
 // @version        0.1
 // @contact.name   Alex Romantsov
 // @host           0.0.0.0:8070
