@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ret0rn/vtbMapAPI/internal/config"
+	"github.com/ret0rn/vtbMapAPI/internal/middleware"
 	"github.com/ret0rn/vtbMapAPI/internal/model"
 	"github.com/ret0rn/vtbMapAPI/internal/service"
 	"github.com/sirupsen/logrus"
@@ -23,7 +24,7 @@ func NewApp(ctx context.Context) (*App, error) {
 	config.Load() // загружаем конфиги из env
 
 	eng := gin.New()
-	eng.Use(gin.Logger(), gin.Recovery())
+	eng.Use(gin.Logger(), gin.Recovery(), middleware.CORSMiddleware())
 
 	eng.ForwardedByClientIP = config.GetForwardedByClientIP()
 
