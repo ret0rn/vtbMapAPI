@@ -1,6 +1,6 @@
-FROM golang:1.20 AS builder
+FROM golang:alpine AS builder
 WORKDIR /build/
-COPY .. .
+COPY . .
 RUN go mod download
 RUN go build -o vtb_map_api main.go
 

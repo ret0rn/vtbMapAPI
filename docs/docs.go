@@ -17,12 +17,87 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/handling_list/by_client": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "получение возможных услуг исходя из типа клиента (физ. лицо/юр. лицо)",
+                "parameters": [
+                    {
+                        "enum": [
+                            1,
+                            2
+                        ],
+                        "type": "integer",
+                        "x-enum-varnames": [
+                            "IndividualClientType",
+                            "EnterpriseClientType"
+                        ],
+                        "name": "client_type",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GetHandlingListByClientResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.GetHandlingListByClientResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.GetHandlingListByClientResponseData"
+                    }
+                }
+            }
+        },
+        "handlers.GetHandlingListByClientResponseData": {
+            "type": "object",
+            "properties": {
+                "client_type": {
+                    "$ref": "#/definitions/model.ClientType"
+                },
+                "handling_duration": {
+                    "description": "в секундах",
+                    "type": "number"
+                },
+                "handling_id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ClientType": {
+            "type": "integer",
+            "enum": [
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "IndividualClientType",
+                "EnterpriseClientType"
+            ]
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "0.1",
 	Host:             "0.0.0.0:8070",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},

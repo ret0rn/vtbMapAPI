@@ -1,9 +1,58 @@
 basePath: /api/v1
+definitions:
+  handlers.GetHandlingListByClientResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/handlers.GetHandlingListByClientResponseData'
+        type: array
+    type: object
+  handlers.GetHandlingListByClientResponseData:
+    properties:
+      client_type:
+        $ref: '#/definitions/model.ClientType'
+      handling_duration:
+        description: в секундах
+        type: number
+      handling_id:
+        type: integer
+      title:
+        type: string
+    type: object
+  model.ClientType:
+    enum:
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - IndividualClientType
+    - EnterpriseClientType
 host: 0.0.0.0:8070
 info:
   contact:
     name: Alex Romantsov
   title: VTB_MAP_API
-  version: "1.0"
-paths: {}
+  version: "0.1"
+paths:
+  /handling_list/by_client:
+    get:
+      parameters:
+      - enum:
+        - 1
+        - 2
+        in: query
+        name: client_type
+        required: true
+        type: integer
+        x-enum-varnames:
+        - IndividualClientType
+        - EnterpriseClientType
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.GetHandlingListByClientResponse'
+      summary: получение возможных услуг исходя из типа клиента (физ. лицо/юр. лицо)
 swagger: "2.0"

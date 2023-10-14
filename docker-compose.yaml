@@ -1,36 +1,40 @@
 version: '3.8'
 
 services:
-  app:
+  database:
     build:
-      context: ./docker
-      dockerfile: app.dockerfile
+      context: ./
+      dockerfile: ./docker/postgis.dockerfile
+    restart: always
     ports:
-      - "8070:8070"
-    restart: on-failure
+      - "6452:5432"
+    volumes:
+      # init tables
+      - ./sql_schemes/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # fill tables
+      #      - ./sql_schemes/fill_tables/fill_office.sql:/docker-entrypoint-initdb.d/fill_office.sql
+      #      - ./sql_schemes/fill_tables/fill_handling.sql:/docker-entrypoint-initdb.d/fill_handling.sql
+
+      - ./db/${ENVIRONMENT:-develop}/postgres/data:/var/lib/postgresql/data
     env_file:
       - env/${ENVIRONMENT:-develop}/database.env
-      - env/${ENVIRONMENT:-develop}/app.env
-    depends_on:
-      - database
     deploy:
       resources:
         limits:
           cpus: "2"
           memory: "2g"
 
-  database:
+  app:
     build:
-      context: ./docker
-      dockerfile: postgis.dockerfile
-    restart: always
+      context: ./
+      dockerfile: ./docker/app.dockerfile
     ports:
-      - "6452:5432"
-    volumes:
-      - ./db/${ENVIRONMENT:-develop}/postgres/data:/var/lib/postgresql/data
-      - ./sql_schemes/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - "8070:8070"
+    restart: on-failure
     env_file:
-      - env/${ENVIRONMENT:-develop}/database.env
+      - env/${ENVIRONMENT:-develop}/app.env
+    depends_on:
+      - database
     deploy:
       resources:
         limits:
