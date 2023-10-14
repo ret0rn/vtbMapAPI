@@ -7,10 +7,12 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/ret0rn/vtbMapAPI/internal/config"
 	"github.com/ret0rn/vtbMapAPI/internal/repository"
+	"github.com/ret0rn/vtbMapAPI/utils/cache"
 )
 
 type Service struct {
-	repo repository.Repo
+	repo  repository.Repo
+	cache *cache.Cache
 }
 
 func NewService(ctx context.Context) (*Service, error) {
@@ -22,6 +24,7 @@ func NewService(ctx context.Context) (*Service, error) {
 	}
 	var repo = repository.NewRepository(masterPool, defaultTimeout)
 	return &Service{
-		repo: repo,
+		repo:  repo,
+		cache: cache.NewCache(),
 	}, nil
 }

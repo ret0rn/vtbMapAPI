@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v4"
-	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/ret0rn/vtbMapAPI/internal/model"
 )
@@ -20,8 +19,8 @@ func (r *Repository) GetHandlingList(ctx context.Context, filter *model.Handling
 			params = append(params, filter.ClientType)
 			addQ += fmt.Sprintf(" and client_type = $%d", len(params))
 		}
-		if len(filter.HandlingIds) > 0 {
-			params = append(params, pq.Array(filter.HandlingIds))
+		if filter.HandlingId != 0 {
+			params = append(params, filter.HandlingId)
 			addQ += fmt.Sprintf(" and handling_id = $%d", len(params))
 		}
 	}

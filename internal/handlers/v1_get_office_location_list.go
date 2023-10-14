@@ -31,17 +31,20 @@ type GetOfficeLocationListResponseData struct {
 	Latitude            float64                                           `json:"latitude"`
 	Rate                float64                                           `json:"rate"`
 	Distance            float64                                           `json:"distance"`
-	TravelDurationHuman float64                                           `json:"travel_duration_human"`
-	TravelDurationCar   float64                                           `json:"travel_duration_car"`
-	CountPeople         int64                                             `json:"count_people"`
+	WaitTime            float64                                           `json:"wait_time"`             // В секундах
+	TravelDurationHuman float64                                           `json:"travel_duration_human"` // Время на маршрут пешком
+	TravelDurationCar   float64                                           `json:"travel_duration_car"`   // Время на маршрут на машине
+	CountPeople         int64                                             `json:"count_people"`          // Кол-во людей в очереди
 	Address             string                                            `json:"address"`
+	WorkloadKoef        float64                                           `json:"workload_koef"`
 	OfficeName          string                                            `json:"officeName"`
-	TimetableIndividual *GetOfficeLocationListResponseDataOfficeTimeTable `json:"timetable_individual"`
-	TimetableEnterprise *GetOfficeLocationListResponseDataOfficeTimeTable `json:"timetable_enterprise"`
+	TimetableIndividual *GetOfficeLocationListResponseDataOfficeTimeTable `json:"timetable_individual"` // Расписание работы для Физ. лиц
+	TimetableEnterprise *GetOfficeLocationListResponseDataOfficeTimeTable `json:"timetable_enterprise"` // Расписание работы для Юр. лиц
 	MetroStation        string                                            `json:"metro_station"`
 	HasRamp             bool                                              `json:"has_ramp"`
-	ClientTypes         []*model.ClientType                               `json:"client_types"`
-	HandlingTypes       []int64                                           `json:"handling_types"`
+	ClientTypes         []*model.ClientType                               `json:"client_types"`   // Обслуживание Физ. лица или Юр. лица
+	HandlingTypes       []int64                                           `json:"handling_types"` // Обслуживание Физ. лица или Юр. лица
+	HandlingDuration    float64                                           `json:"handling_duration"`
 }
 
 type GetOfficeLocationListResponseDataOfficeTimeTable struct {
@@ -79,7 +82,7 @@ func (i *Implementation) GetOfficeLocationList(ctx *gin.Context) {
 		filter.ClientType = req.Filter.ClientType
 		filter.HandlingType = req.Filter.HandlingType
 	}
-	list, countPeople, ratesMap, err := i.srv.GetOfficeLocationList(ctx, filter)
+	list, countPeople, ratesMap, handlingDuration, err := i.srv.GetOfficeLocationList(ctx, filter)
 	if err != nil {
 		logrus.Error(ctx, "[GetOfficeLocationList] - cent's get handling list %s", err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, model.NewError("Ошибка при получение списка офисов"))
@@ -87,23 +90,27 @@ func (i *Implementation) GetOfficeLocationList(ctx *gin.Context) {
 	}
 	var resp GetOfficeLocationListResponse
 	for _, office := range list {
+		countPpl := countPeople[office.OfficeID]
 		resp.Data = append(resp.Data, &GetOfficeLocationListResponseData{
 			OfficeID:            office.OfficeID,
 			Longitude:           office.Longitude,
 			Latitude:            office.Latitude,
 			Rate:                ratesMap[office.OfficeID],
 			Distance:            office.Distance,
-			TravelDurationHuman: (office.Distance / humanSpeed) * 60, // время на маршрут пешком
-			TravelDurationCar:   (office.Distance / carSpeed) * 60,   // время на маршрут на машине
-			CountPeople:         countPeople[office.OfficeID],        // кол-во людей в очереди
+			WaitTime:            handlingDuration.Seconds() * float64(countPpl),
+			TravelDurationHuman: (office.Distance / humanSpeed) * 60,
+			TravelDurationCar:   (office.Distance / carSpeed) * 60,
+			CountPeople:         countPpl,
 			Address:             office.Address,
 			OfficeName:          office.OfficeName,
-			TimetableIndividual: converTimeTable(office.TimetableIndividual), // расписание работы для Физ. лиц
-			TimetableEnterprise: converTimeTable(office.TimetableEnterprise), // расписание работы для Юр. лиц
+			TimetableIndividual: converTimeTable(office.TimetableIndividual),
+			TimetableEnterprise: converTimeTable(office.TimetableEnterprise),
 			MetroStation:        office.MetroStation,
 			HasRamp:             office.HasRamp,
-			ClientTypes:         office.ClientTypes,   // обслуживание Физ. лица или Юр. лица
-			HandlingTypes:       office.HandlingTypes, // обслуживание Физ. лица или Юр. лица
+			ClientTypes:         office.ClientTypes,
+			HandlingTypes:       office.HandlingTypes,
+			WorkloadKoef:        handlingDuration.Hours() * float64(countPpl),
+			HandlingDuration:    handlingDuration.Seconds(),
 		})
 	}
 	ctx.JSON(http.StatusOK, resp)

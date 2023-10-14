@@ -12,6 +12,6 @@ type Handling struct {
 }
 
 type HandlingFilter struct {
-	HandlingIds []int64
-	ClientType  ClientType
+	HandlingId int64
+	ClientType ClientType
 }

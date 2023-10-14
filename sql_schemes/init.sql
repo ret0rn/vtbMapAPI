@@ -18,7 +18,6 @@ CREATE TABLE public."office" (
     metro_station text NOT NULL,
     handling_ids int8[] NULL,
     client_types int8[] NULL,
-    max_people_on_window int8 NOT NULL DEFAULT 0,
     has_ramp bool NOT NULL DEFAULT false,
     created timestamp NOT NULL DEFAULT now(),
     updated timestamp NOT NULL DEFAULT now(),
