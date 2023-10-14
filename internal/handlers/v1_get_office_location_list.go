@@ -60,7 +60,7 @@ type GetOfficeLocationListResponseDataDayTimeTable struct {
 // GetOfficeLocationList       godoc
 // @Summary                    Получение ближайших отделений с загруженностью
 // @Produce                    json
-// @Param                      req query GetOfficeLocationListRequest true "office location list request"
+// @Param                      req body GetOfficeLocationListRequest true "office location list request"
 // @Success                    200 {object} GetOfficeLocationListResponse
 // @Router                     /office/location [post]
 func (i *Implementation) GetOfficeLocationList(ctx *gin.Context) {
