@@ -21,8 +21,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2"
-          memory: "2g"
+          cpus: "1"
+          memory: "1g"
 
   app:
     build:
@@ -38,5 +38,5 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2"
-          memory: "2g"
+          cpus: "1"
+          memory: "1g"
