@@ -58,16 +58,13 @@ const docTemplate = `{
                 "summary": "Получение ближайших отделений с загруженностью",
                 "parameters": [
                     {
-                        "type": "number",
-                        "name": "latitude",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "number",
-                        "name": "longitude",
-                        "in": "query",
-                        "required": true
+                        "description": "office location list request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GetOfficeLocationListRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -111,6 +108,24 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.GetOfficeLocationListRequest": {
+            "type": "object",
+            "required": [
+                "latitude",
+                "longitude"
+            ],
+            "properties": {
+                "filter": {
+                    "$ref": "#/definitions/handlers.GetOfficeLocationListRequestFilter"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                }
+            }
+        },
         "handlers.GetOfficeLocationListRequestFilter": {
             "type": "object",
             "required": [
@@ -144,18 +159,24 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "client_types": {
+                    "description": "Обслуживание Физ. лица или Юр. лица",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.ClientType"
                     }
                 },
                 "count_people": {
+                    "description": "Кол-во людей в очереди",
                     "type": "integer"
                 },
                 "distance": {
                     "type": "number"
                 },
+                "handling_duration": {
+                    "type": "number"
+                },
                 "handling_types": {
+                    "description": "Обслуживание Физ. лица или Юр. лица",
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -183,15 +204,34 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "timetable_enterprise": {
-                    "$ref": "#/definitions/handlers.GetOfficeLocationListResponseDataOfficeTimeTable"
+                    "description": "Расписание работы для Юр. лиц",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/handlers.GetOfficeLocationListResponseDataOfficeTimeTable"
+                        }
+                    ]
                 },
                 "timetable_individual": {
-                    "$ref": "#/definitions/handlers.GetOfficeLocationListResponseDataOfficeTimeTable"
+                    "description": "Расписание работы для Физ. лиц",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/handlers.GetOfficeLocationListResponseDataOfficeTimeTable"
+                        }
+                    ]
                 },
                 "travel_duration_car": {
+                    "description": "Время на маршрут на машине",
                     "type": "number"
                 },
                 "travel_duration_human": {
+                    "description": "Время на маршрут пешком",
+                    "type": "number"
+                },
+                "wait_time": {
+                    "description": "В секундах",
+                    "type": "number"
+                },
+                "workload_koef": {
                     "type": "number"
                 }
             }
