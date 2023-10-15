@@ -102,8 +102,6 @@ func (i *Implementation) GetOfficeLocationList(ctx *gin.Context) {
 			CountPeople:         countPpl,
 			Address:             office.Address,
 			OfficeName:          office.OfficeName,
-			TimetableIndividual: converTimeTable(office.TimetableIndividual),
-			TimetableEnterprise: converTimeTable(office.TimetableEnterprise),
 			MetroStation:        office.MetroStation,
 			HasRamp:             office.HasRamp,
 			ClientTypes:         office.ClientTypes,
@@ -114,16 +112,4 @@ func (i *Implementation) GetOfficeLocationList(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, resp)
 	return
-}
-
-func converTimeTable(timeTables *model.OfficeTimeTable) *GetOfficeLocationListResponseDataOfficeTimeTable {
-	var respTimeTable GetOfficeLocationListResponseDataOfficeTimeTable
-	for _, tt := range timeTables.Days {
-		respTimeTable.Days = append(respTimeTable.Days, &GetOfficeLocationListResponseDataDayTimeTable{
-			Day:   tt.Day,
-			Start: tt.Start,
-			Stop:  tt.Stop,
-		})
-	}
-	return &respTimeTable
 }

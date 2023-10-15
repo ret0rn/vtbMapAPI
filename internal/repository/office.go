@@ -14,14 +14,12 @@ import (
 func (r *Repository) GetOfficeLocation(ctx context.Context, filter *model.OfficeLocationFilter) (list model.OfficeLocationList, err error) {
 	const maxDistanceKM = 3000
 	const q = `SELECT office_id, longitude, latitude, distance, address, 
-       		   office_name, timetable_individual, timetable_enterprise, metro_station, 
+       		   office_name, metro_station, 
        		   has_ramp, client_types, handling_ids FROM (
 			   SELECT ST_Distance(
 				   ST_GeogFromText('SRID=4326;POINT(' || $1 || ' ' || $2 || ')'),
 				   geom
 			   ) distance, office_id, longitude, latitude, address, office_name, 
-       		   coalesce(timetable_individual, '{}'::jsonb) timetable_individual,
-			   coalesce(timetable_enterprise, '{}'::jsonb) timetable_enterprise,
 			   metro_station, has_ramp, client_types, handling_ids
 			   FROM public."office" WHERE is_active %s
 			   ORDER BY location <-> point ('(' || $1 || ', ' || $2 || ')') LIMIT 10)
@@ -54,8 +52,6 @@ func (r *Repository) GetOfficeLocation(ctx context.Context, filter *model.Office
 			&row.Distance,
 			&row.Address,
 			&row.OfficeName,
-			&row.TimetableIndividual,
-			&row.TimetableEnterprise,
 			&row.MetroStation,
 			&row.HasRamp,
 			&row.ClientTypes,
