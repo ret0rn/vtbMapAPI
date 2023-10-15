@@ -19,14 +19,27 @@ func (s *Service) GetHandlingByFilter(ctx context.Context, filter *model.Handlin
 }
 
 func (s *Service) GetHandlingListByFilter(ctx context.Context, filter *model.HandlingFilter) (model.HandlingList, error) {
-	data, ok := s.cache.Get(fmt.Sprintf(model.CacheHandlingKey, filter.ClientType, filter.HandlingId))
+	var (
+		clientType model.ClientType
+		handlingId int64
+	)
+
+	if filter != nil {
+		clientType = filter.ClientType
+		handlingId = filter.HandlingId
+	}
+
+	data, ok := s.cache.Get(fmt.Sprintf(model.CacheHandlingKey, clientType, handlingId))
 	if ok {
-		return data.(model.HandlingList), nil
+		val, get := data.(model.HandlingList)
+		if get {
+			return val, nil
+		}
 	}
 	list, err := s.repo.GetHandlingList(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
-	s.cache.Set(fmt.Sprintf(model.CacheHandlingKey, filter.ClientType, filter.HandlingId), list, model.DefaultTTl)
+	s.cache.Set(fmt.Sprintf(model.CacheHandlingKey, clientType, handlingId), list, model.DefaultTTl)
 	return list, nil
 }

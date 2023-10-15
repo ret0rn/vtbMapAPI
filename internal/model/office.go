@@ -1,7 +1,5 @@
 package model
 
-import "time"
-
 type Office struct {
 	OfficeID            int64
 	Longitude           float64
@@ -35,13 +33,13 @@ type OfficeLocation struct {
 }
 
 type OfficeTimeTable struct {
-	Days []*DayTimeTable
+	Days []*DayTimeTable `json:"days"`
 }
 
 type DayTimeTable struct {
-	Day   string
-	Start *time.Time
-	Stop  *time.Time
+	Day   string `json:"day"`
+	Start string `json:"start"`
+	Stop  string `json:"stop"`
 }
 
 type OfficeLocationFilter struct {

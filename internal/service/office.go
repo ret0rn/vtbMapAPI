@@ -34,3 +34,7 @@ func (s *Service) GetOfficeLocationList(ctx context.Context, filter *model.Offic
 
 	return list, countPeople, ratesMap, handlingDuration, nil
 }
+
+func (s *Service) NewOffice(ctx context.Context, office *model.Office) error {
+	return s.repo.NewOffice(ctx, office)
+}

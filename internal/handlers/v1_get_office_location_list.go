@@ -3,7 +3,6 @@ package handlers
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ret0rn/vtbMapAPI/internal/model"
@@ -122,8 +121,8 @@ func converTimeTable(timeTables *model.OfficeTimeTable) *GetOfficeLocationListRe
 	for _, tt := range timeTables.Days {
 		respTimeTable.Days = append(respTimeTable.Days, &GetOfficeLocationListResponseDataDayTimeTable{
 			Day:   tt.Day,
-			Start: tt.Start.Format(time.RFC3339),
-			Stop:  tt.Stop.Format(time.RFC3339),
+			Start: tt.Start,
+			Stop:  tt.Stop,
 		})
 	}
 	return &respTimeTable

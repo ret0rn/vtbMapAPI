@@ -13,6 +13,7 @@ type Repo interface {
 	GetOfficeLocation(context.Context, *model.OfficeLocationFilter) (model.OfficeLocationList, error)
 	GetRatesByOffice(context.Context, []int64) (map[int64]float64, error)
 	GetCountPeopleByOffice(context.Context, []int64, int64) (map[int64]int64, error)
+	NewOffice(context.Context, *model.Office) error
 }
 
 type Repository struct {

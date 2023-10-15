@@ -2,9 +2,11 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/jackc/pgx/v4"
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/ret0rn/vtbMapAPI/internal/model"
 )
@@ -65,4 +67,40 @@ func (r *Repository) GetOfficeLocation(ctx context.Context, filter *model.Office
 		list = append(list, &row)
 	}
 	return list, rows.Err()
+}
+
+func (r *Repository) NewOffice(ctx context.Context, office *model.Office) error {
+	const q = `INSERT INTO public.office
+			(longitude, latitude, "location", geom, address, 
+			 office_name, timetable_individual, timetable_enterprise, 
+			 metro_station, handling_ids, client_types, has_ramp)
+			VALUES($1, $2, '(%f, %f)', ST_SetSRID(ST_MakePoint($1, $2), 4326), $3, $4, $5, $6, $7, $8, $9, $10);`
+
+	ctxDb, cancel := context.WithTimeout(ctx, r.timeout)
+	defer cancel()
+
+	timetableIndividual, err := json.Marshal(office.TimetableIndividual.Days)
+	if err != nil && err != pgx.ErrNoRows {
+		return errors.Wrapf(err, "Marshal timetableIndividual error")
+	}
+	timetableEnterprise, err := json.Marshal(office.TimetableEnterprise.Days)
+	if err != nil && err != pgx.ErrNoRows {
+		return errors.Wrapf(err, "Marshal timetableEnterprise error")
+	}
+	_, err = r.MasterPool.Exec(ctxDb, fmt.Sprintf(q, office.Longitude, office.Latitude),
+		office.Longitude,
+		office.Latitude,
+		office.Address,
+		office.OfficeName,
+		timetableIndividual,
+		timetableEnterprise,
+		office.MetroStation,
+		pq.Array(office.HandlingTypes),
+		pq.Array(office.ClientTypes),
+		office.HasRamp,
+	) // TODO: заменить на SlavePool
+	if err != nil && err != pgx.ErrNoRows {
+		return errors.Wrapf(err, "query error")
+	}
+	return nil
 }
