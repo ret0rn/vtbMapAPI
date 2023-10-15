@@ -25,7 +25,9 @@ func (s *Service) GetOfficeLocationList(ctx context.Context, filter *model.Offic
 		if err != nil {
 			return nil, nil, nil, 0, errors.Wrapf(err, "GetWorkloadByOffice error")
 		}
-		handlingDuration = *handling.HandlingDuration
+		if handling != nil && handling.HandlingDuration != nil {
+			handlingDuration = *handling.HandlingDuration
+		}
 	}
 	ratesMap, err := s.repo.GetRatesByOffice(ctx, list.GetOfficeIds())
 	if err != nil {
