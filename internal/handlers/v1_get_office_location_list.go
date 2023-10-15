@@ -64,8 +64,9 @@ type GetOfficeLocationListResponseDataDayTimeTable struct {
 // @Router                     /office/location [post]
 func (i *Implementation) GetOfficeLocationList(ctx *gin.Context) {
 	const (
-		humanSpeed = 70  // м/м
-		carSpeed   = 800 // м/м
+		humanSpeed   = 70  // м/м
+		carSpeed     = 800 // м/м
+		coefMultiple = 10
 	)
 	var req GetOfficeLocationListRequest // получаем и валидируем запрос
 	if err := ctx.ShouldBind(&req); err != nil {
@@ -106,7 +107,7 @@ func (i *Implementation) GetOfficeLocationList(ctx *gin.Context) {
 			HasRamp:             office.HasRamp,
 			ClientTypes:         office.ClientTypes,
 			HandlingTypes:       office.HandlingTypes,
-			WorkloadKoef:        handlingDuration.Hours() * float64(countPpl),
+			WorkloadKoef:        handlingDuration.Hours() * float64(countPpl) * coefMultiple,
 			HandlingDuration:    handlingDuration.Seconds(),
 		})
 	}
