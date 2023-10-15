@@ -4,6 +4,11 @@ API для нахождения оптимального офиса исходя
 
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/ret0rn/vtbMapAPI?style=plastic)](https://github.com/ret0rn/vtbMapAPI/blob/master/go.mod)
 
+## Client
+
+### <a href="https://github.com/eduardpawlow/vtb-offices">Fronted client</a>
+
+##
 
 ## Запуск
 
