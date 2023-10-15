@@ -17,7 +17,7 @@ type HandlingFilter struct {
 }
 
 func (hl HandlingList) GetHandlingIds() []int64 {
-	var handlingIds = make([]int64, len(hl))
+	var handlingIds = make([]int64, 0, len(hl))
 	for _, h := range hl {
 		handlingIds = append(handlingIds, h.HandlingId)
 	}
